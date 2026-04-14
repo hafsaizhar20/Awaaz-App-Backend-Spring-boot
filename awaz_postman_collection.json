@@ -1,0 +1,399 @@
+{
+	"info": {
+		"_postman_id": "98765432-1234-5678-90ab-cdef12345678",
+		"name": "AWAZ FYP - Unified Collection",
+		"description": "The complete structured API collection for the AWAZ Autism Communication App.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Register Parent",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\",\n  \"fullName\": \"John Parent\",\n  \"role\": \"PARENT\",\n  \"address\": \"Street 123, Lahore\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/auth/register",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/auth/login",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Parent Dashboard",
+			"item": [
+				{
+					"name": "Register/Add Child",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"child@example.com\",\n  \"password\": \"ChildPass123\",\n  \"firstName\": \"Little\",\n  \"lastName\": \"John\",\n  \"dateOfBirth\": \"2018-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/parents/children",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"parents",
+								"children"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Children List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/parents/children",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"parents",
+								"children"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Therapist to Child",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"therapistEmail\": \"therapist@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/parents/children/1/assign-therapist",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"parents",
+								"children",
+								"1",
+								"assign-therapist"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{parentToken}}",
+						"type": "string"
+					}
+				]
+			}
+		},
+		{
+			"name": "3. Therapist Dashboard",
+			"item": [
+				{
+					"name": "View My Assigned Children",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/therapists/children",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"therapists",
+								"children"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{therapistToken}}",
+						"type": "string"
+					}
+				]
+			}
+		},
+		{
+			"name": "4. AAC Communication Board",
+			"item": [
+				{
+					"name": "Step 1: Create Category (e.g. Cars)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cars\",\n  \"iconUrl\": \"https://cdn-icons-png.flaticon.com/512/3202/3202926.png\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/categories",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 2: Add Item to Category (e.g. Alto)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"label\": \"Alto\",\n  \"speechText\": \"I like the Alto car\",\n  \"imageUrl\": \"https://example.com/alto.png\",\n  \"categoryId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/icons",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"icons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 3: View All Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/categories",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 4: View Items In Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/categories/1/icons",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"categories",
+								"1",
+								"icons"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{parentToken}}",
+						"type": "string"
+					}
+				]
+			}
+		},
+		{
+			"name": "5. Progress Tracking & Analytics",
+			"item": [
+				{
+					"name": "Log Icon Usage (Child Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{childToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"iconId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/log",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"log"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Child Usage Analytics (Parent/Therapist)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{parentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/analytics/1",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"analytics",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "FYPurl",
+			"value": "http://localhost:8081"
+		},
+		{
+			"key": "parentToken",
+			"value": "PASTE_TOKEN_HERE"
+		},
+		{
+			"key": "therapistToken",
+			"value": "PASTE_TOKEN_HERE"
+		},
+		{
+			"key": "childToken",
+			"value": "PASTE_TOKEN_HERE"
+		}
+	]
+}
