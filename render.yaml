@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: awaz-backend
+    runtime: docker
+    plan: free # Change to starter if you need more power
+    region: ohio # Change to your preferred region
+    envVars:
+      - key: SERVER_PORT
+        value: 8081
+      - key: DB_URL
+        sync: false # Set this in Render Dashboard
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true # Render will generate a random secret for you
+      - key: JWT_EXPIRATION
+        value: 86400000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: aac-media
