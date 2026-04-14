@@ -4,5 +4,6 @@ public enum UserRole {
     USER,
     THERAPIST,
     PARENT,
-    CHILD
+    CHILD,
+    ADMIN
 }

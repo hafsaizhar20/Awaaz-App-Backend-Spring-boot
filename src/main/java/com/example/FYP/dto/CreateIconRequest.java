@@ -16,4 +16,6 @@ public class CreateIconRequest {
     
     @NotNull(message = "Category ID is required")
     private Long categoryId;
+
+    private Long childId; // Optional: If provided, this icon belongs to a specific child
 }

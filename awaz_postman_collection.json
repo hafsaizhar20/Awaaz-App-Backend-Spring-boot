@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "98765432-1234-5678-90ab-cdef12345678",
-		"name": "AWAZ FYP - Unified Collection",
-		"description": "The complete structured API collection for the AWAZ Autism Communication App.",
+		"name": "AWAZ FYP - Final Unified Collection",
+		"description": "The complete structured API collection for the AWAZ Autism Communication App, including Personalized Boards and Image Uploads.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -116,36 +116,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Assign Therapist to Child",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"therapistEmail\": \"therapist@example.com\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/parents/children/1/assign-therapist",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"parents",
-								"children",
-								"1",
-								"assign-therapist"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"auth": {
@@ -160,55 +130,72 @@
 			}
 		},
 		{
-			"name": "3. Therapist Dashboard",
+			"name": "3. AAC Global Board",
 			"item": [
 				{
-					"name": "View My Assigned Children",
+					"name": "View Standard Categories (Startup Data)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{FYPurl}}/api/therapists/children",
+							"raw": "{{FYPurl}}/api/aac/categories",
 							"host": [
 								"{{FYPurl}}"
 							],
 							"path": [
 								"api",
-								"therapists",
-								"children"
+								"aac",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Icons in Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{FYPurl}}/api/aac/categories/1/icons",
+							"host": [
+								"{{FYPurl}}"
+							],
+							"path": [
+								"api",
+								"aac",
+								"categories",
+								"1",
+								"icons"
 							]
 						}
 					},
 					"response": []
 				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{therapistToken}}",
-						"type": "string"
-					}
-				]
-			}
+			]
 		},
 		{
-			"name": "4. AAC Communication Board",
+			"name": "4. Personalized Boards (Parent Only)",
 			"item": [
 				{
-					"name": "Step 1: Create Category (e.g. Cars)",
+					"name": "Create Custom Category for Child",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Cars\",\n  \"iconUrl\": \"https://cdn-icons-png.flaticon.com/512/3202/3202926.png\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "category",
+									"value": "{\n  \"name\": \"My Favorite Toys\",\n  \"childId\": 1\n}",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{FYPurl}}/api/aac/categories",
@@ -225,18 +212,24 @@
 					"response": []
 				},
 				{
-					"name": "Step 2: Add Item to Category (e.g. Alto)",
+					"name": "Create Custom Icon for Child (With Image Upload)",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"label\": \"Alto\",\n  \"speechText\": \"I like the Alto car\",\n  \"imageUrl\": \"https://example.com/alto.png\",\n  \"categoryId\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "icon",
+									"value": "{\n  \"label\": \"My Teddy Bear\",\n  \"categoryId\": 1,\n  \"childId\": 1\n}",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{FYPurl}}/api/aac/icons",
@@ -253,12 +246,12 @@
 					"response": []
 				},
 				{
-					"name": "Step 3: View All Categories",
+					"name": "View Personalized Board for Child",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories",
+							"raw": "{{FYPurl}}/api/aac/categories?childId=1",
 							"host": [
 								"{{FYPurl}}"
 							],
@@ -266,27 +259,12 @@
 								"api",
 								"aac",
 								"categories"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Step 4: View Items In Category",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories/1/icons",
-							"host": [
-								"{{FYPurl}}"
 							],
-							"path": [
-								"api",
-								"aac",
-								"categories",
-								"1",
-								"icons"
+							"query": [
+								{
+									"key": "childId",
+									"value": "1"
+								}
 							]
 						}
 					},

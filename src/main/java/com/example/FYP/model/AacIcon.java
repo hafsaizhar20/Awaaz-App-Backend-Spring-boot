@@ -28,4 +28,8 @@ public class AacIcon {
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
     private AacCategory category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "child_id")
+    private ChildProfile child;
 }

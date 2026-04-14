@@ -5,10 +5,13 @@ import com.example.FYP.model.AacCategory;
 import com.example.FYP.model.AacIcon;
 import com.example.FYP.service.AacService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -24,25 +27,31 @@ public class AacController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<ApiResponse<List<AacCategory>>> getAllCategories() {
-        return ResponseEntity.ok(ApiResponse.success(aacService.getAllCategories(), 200));
+    public ResponseEntity<ApiResponse<List<AacCategory>>> getAllCategories(@RequestParam(required = false) Long childId) {
+        return ResponseEntity.ok(ApiResponse.success(aacService.getAllCategories(childId), 200));
     }
 
     @GetMapping("/categories/{categoryId}/icons")
-    public ResponseEntity<ApiResponse<List<AacIcon>>> getIconsByCategory(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(ApiResponse.success(aacService.getIconsByCategory(categoryId), 200));
+    public ResponseEntity<ApiResponse<List<AacIcon>>> getIconsByCategory(@PathVariable Long categoryId, @RequestParam(required = false) Long childId) {
+        return ResponseEntity.ok(ApiResponse.success(aacService.getIconsByCategory(categoryId, childId), 200));
     }
 
-    @PostMapping("/categories")
-    @PreAuthorize("hasAnyRole('PARENT', 'THERAPIST', 'ADMIN')")
-    public ResponseEntity<ApiResponse<AacCategory>> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
-        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createCategory(request), 201));
+    @PostMapping(value = "/categories", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<AacCategory>> createCategory(
+            @RequestPart("category") @Valid CreateCategoryRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            Principal principal) throws IOException {
+        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createCategory(principal.getName(), request, file), 201));
     }
 
-    @PostMapping("/icons")
-    @PreAuthorize("hasAnyRole('PARENT', 'THERAPIST', 'ADMIN')")
-    public ResponseEntity<ApiResponse<AacIcon>> createIcon(@Valid @RequestBody CreateIconRequest request) {
-        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createIcon(request), 201));
+    @PostMapping(value = "/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<AacIcon>> createIcon(
+            @RequestPart("icon") @Valid CreateIconRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            Principal principal) throws IOException {
+        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createIcon(principal.getName(), request, file), 201));
     }
 
     @PostMapping("/log")
