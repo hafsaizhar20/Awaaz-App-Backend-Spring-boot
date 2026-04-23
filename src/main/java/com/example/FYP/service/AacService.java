@@ -64,6 +64,13 @@ public class AacService {
         ChildProfile child = null;
         if (request.getChildId() != null) {
             child = verifyAndGetChild(email, request.getChildId());
+            if (categoryRepository.existsByNameAndChild(request.getName(), child)) {
+                throw new RuntimeException("Category '" + request.getName() + "' already exists for this child.");
+            }
+        } else {
+            if (categoryRepository.existsByNameAndChildIsNull(request.getName())) {
+                throw new RuntimeException("Standard category '" + request.getName() + "' already exists.");
+            }
         }
 
         String iconUrl = request.getIconUrl();
@@ -87,6 +94,13 @@ public class AacService {
         ChildProfile child = null;
         if (request.getChildId() != null) {
             child = verifyAndGetChild(email, request.getChildId());
+            if (iconRepository.existsByLabelAndCategoryAndChild(request.getLabel(), category, child)) {
+                throw new RuntimeException("Icon '" + request.getLabel() + "' already exists in this category for this child.");
+            }
+        } else {
+            if (iconRepository.existsByLabelAndCategoryAndChildIsNull(request.getLabel(), category)) {
+                throw new RuntimeException("Standard icon '" + request.getLabel() + "' already exists in this category.");
+            }
         }
 
         String imageUrl = request.getImageUrl();

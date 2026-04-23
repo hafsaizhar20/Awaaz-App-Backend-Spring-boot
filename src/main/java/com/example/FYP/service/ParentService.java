@@ -76,6 +76,18 @@ public class ParentService {
                 .collect(Collectors.toList());
     }
 
+    public List<TherapistResponse> getAllTherapists() {
+        return therapistProfileRepository.findAll().stream()
+                .map(profile -> TherapistResponse.builder()
+                        .id(profile.getId())
+                        .firstName(profile.getFirstName())
+                        .lastName(profile.getLastName())
+                        .specialization(profile.getSpecialization())
+                        .email(profile.getUser().getEmail())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void assignTherapist(String parentEmail, Long childId, String therapistEmail) {
         User parentUser = userRepository.findByEmail(parentEmail).orElseThrow(() -> new RuntimeException("Parent not found"));

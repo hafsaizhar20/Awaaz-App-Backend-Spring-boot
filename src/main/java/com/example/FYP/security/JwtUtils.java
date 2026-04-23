@@ -35,6 +35,15 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateTokenFromEmail(String email) {
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String getEmailFromJwtToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())

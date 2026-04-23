@@ -13,4 +13,6 @@ public interface AacIconRepository extends JpaRepository<AacIcon, Long> {
     List<AacIcon> findByCategory(AacCategory category);
     List<AacIcon> findByCategoryAndChildIsNull(AacCategory category);
     List<AacIcon> findByCategoryAndChildOrChildIsNull(AacCategory category, ChildProfile child);
+    boolean existsByLabelAndCategoryAndChildIsNull(String label, AacCategory category);
+    boolean existsByLabelAndCategoryAndChild(String label, AacCategory category, ChildProfile child);
 }

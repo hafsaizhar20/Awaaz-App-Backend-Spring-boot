@@ -35,12 +35,8 @@ public class ParentController {
         return ResponseEntity.ok(ApiResponse.success(parentService.getMyChildren(userDetails.getUsername()), 200));
     }
 
-    @PostMapping("/children/{childId}/assign-therapist")
-    public ResponseEntity<ApiResponse<String>> assignTherapist(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long childId,
-            @Valid @RequestBody AssignTherapistRequest request) {
-        parentService.assignTherapist(userDetails.getUsername(), childId, request.getTherapistEmail());
-        return ResponseEntity.ok(ApiResponse.success("Therapist assigned successfully", 200));
+    @GetMapping("/therapists")
+    public ResponseEntity<ApiResponse<List<TherapistResponse>>> getAllTherapists() {
+        return ResponseEntity.ok(ApiResponse.success(parentService.getAllTherapists(), 200));
     }
 }

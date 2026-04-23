@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "aac_icons")
+@Table(name = "aac_icons", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"label", "category_id", "child_id"})
+})
 @Getter
 @Setter
 @NoArgsConstructor

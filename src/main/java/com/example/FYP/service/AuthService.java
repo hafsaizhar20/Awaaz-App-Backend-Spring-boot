@@ -88,11 +88,20 @@ public class AuthService {
             therapistProfileRepository.save(therapistProfile);
         }
 
+        String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
+
+        AuthResponse authResponse = AuthResponse.builder()
+                .token(jwt)
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .build();
+
         return UserResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .fullName(request.getFullName())
+                .authResponse(authResponse)
                 .build();
     }
 

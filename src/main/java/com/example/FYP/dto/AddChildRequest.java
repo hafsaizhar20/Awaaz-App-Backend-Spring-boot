@@ -9,11 +9,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddChildRequest {
-    private String email; // for child login
-    private String password; // for child login
+    private String email;
+    private String password;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
     private String diagnosisDetails;
-    private Long therapistId; // optional
+    private Long therapistId;
 }

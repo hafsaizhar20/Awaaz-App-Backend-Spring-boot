@@ -5,6 +5,7 @@ import com.example.FYP.model.AacCategory;
 import com.example.FYP.model.AacIcon;
 import com.example.FYP.service.AacService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/aac")
 public class AacController {
 
+    @Autowired
     private final AacService aacService;
 
     public AacController(AacService aacService) {

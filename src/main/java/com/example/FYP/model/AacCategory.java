@@ -6,7 +6,9 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "aac_categories")
+@Table(name = "aac_categories", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"name", "child_id"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
