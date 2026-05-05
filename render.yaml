@@ -5,8 +5,6 @@ services:
     plan: free # Change to starter if you need more power
     region: ohio # Change to your preferred region
     envVars:
-      - key: SERVER_PORT
-        value: 8081
       - key: DB_URL
         sync: false # Set this in Render Dashboard
       - key: DB_USERNAME

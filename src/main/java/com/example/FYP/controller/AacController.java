@@ -29,18 +29,18 @@ public class AacController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<ApiResponse<List<AacCategory>>> getAllCategories(@RequestParam(required = false) Long childId) {
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories(@RequestParam(required = false) Long childId) {
         return ResponseEntity.ok(ApiResponse.success(aacService.getAllCategories(childId), 200));
     }
 
     @GetMapping("/categories/{categoryId}/icons")
-    public ResponseEntity<ApiResponse<List<AacIcon>>> getIconsByCategory(@PathVariable Long categoryId, @RequestParam(required = false) Long childId) {
+    public ResponseEntity<ApiResponse<List<IconResponse>>> getIconsByCategory(@PathVariable Long categoryId, @RequestParam(required = false) Long childId) {
         return ResponseEntity.ok(ApiResponse.success(aacService.getIconsByCategory(categoryId, childId), 200));
     }
 
     @PostMapping(value = "/categories", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
-    public ResponseEntity<ApiResponse<AacCategory>> createCategory(
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @RequestPart("category") @Valid CreateCategoryRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
             Principal principal) throws IOException {
@@ -49,7 +49,7 @@ public class AacController {
 
     @PostMapping(value = "/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
-    public ResponseEntity<ApiResponse<AacIcon>> createIcon(
+    public ResponseEntity<ApiResponse<IconResponse>> createIcon(
             @RequestPart("icon") @Valid CreateIconRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
             Principal principal) throws IOException {

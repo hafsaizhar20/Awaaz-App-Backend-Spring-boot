@@ -38,29 +38,35 @@ public class AacService {
         this.storageService = storageService;
     }
 
-    public List<AacCategory> getAllCategories(Long childId) {
+    public List<CategoryResponse> getAllCategories(Long childId) {
+        List<AacCategory> categories;
         if (childId != null) {
             ChildProfile child = childProfileRepository.findById(childId)
                     .orElseThrow(() -> new RuntimeException("Child not found"));
-            return categoryRepository.findByChildOrChildIsNull(child);
+            categories = categoryRepository.findByChildOrChildIsNull(child);
+        } else {
+            categories = categoryRepository.findByChildIsNull();
         }
-        return categoryRepository.findByChildIsNull();
+        return categories.stream().map(this::mapToCategoryResponse).collect(java.util.stream.Collectors.toList());
     }
 
-    public List<AacIcon> getIconsByCategory(Long categoryId, Long childId) {
+    public List<IconResponse> getIconsByCategory(Long categoryId, Long childId) {
         AacCategory category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         
+        List<AacIcon> icons;
         if (childId != null) {
             ChildProfile child = childProfileRepository.findById(childId)
                     .orElseThrow(() -> new RuntimeException("Child not found"));
-            return iconRepository.findByCategoryAndChildOrChildIsNull(category, child);
+            icons = iconRepository.findByCategoryAndChildOrChildIsNull(category, child);
+        } else {
+            icons = iconRepository.findByCategoryAndChildIsNull(category);
         }
-        return iconRepository.findByCategoryAndChildIsNull(category);
+        return icons.stream().map(this::mapToIconResponse).collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional
-    public AacCategory createCategory(String email, CreateCategoryRequest request, MultipartFile file) throws IOException {
+    public CategoryResponse createCategory(String email, CreateCategoryRequest request, MultipartFile file) throws IOException {
         ChildProfile child = null;
         if (request.getChildId() != null) {
             child = verifyAndGetChild(email, request.getChildId());
@@ -83,11 +89,11 @@ public class AacService {
                 .iconUrl(iconUrl)
                 .child(child)
                 .build();
-        return categoryRepository.save(category);
+        return mapToCategoryResponse(categoryRepository.save(category));
     }
 
     @Transactional
-    public AacIcon createIcon(String email, CreateIconRequest request, MultipartFile file) throws IOException {
+    public IconResponse createIcon(String email, CreateIconRequest request, MultipartFile file) throws IOException {
         AacCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -115,7 +121,27 @@ public class AacService {
                 .category(category)
                 .child(child)
                 .build();
-        return iconRepository.save(icon);
+        return mapToIconResponse(iconRepository.save(icon));
+    }
+
+    private CategoryResponse mapToCategoryResponse(AacCategory category) {
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .iconUrl(category.getIconUrl())
+                .childId(category.getChild() != null ? category.getChild().getId() : null)
+                .build();
+    }
+
+    private IconResponse mapToIconResponse(AacIcon icon) {
+        return IconResponse.builder()
+                .id(icon.getId())
+                .label(icon.getLabel())
+                .imageUrl(icon.getImageUrl())
+                .speechText(icon.getSpeechText())
+                .categoryId(icon.getCategory().getId())
+                .childId(icon.getChild() != null ? icon.getChild().getId() : null)
+                .build();
     }
 
     private ChildProfile verifyAndGetChild(String email, Long childId) {
