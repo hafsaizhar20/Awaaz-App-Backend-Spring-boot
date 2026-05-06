@@ -26,17 +26,17 @@ public class ParentController {
     public ResponseEntity<ApiResponse<ChildResponse>> addChild(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody AddChildRequest addChildRequest) {
-        return ResponseEntity.status(201).body(ApiResponse.success(parentService.addChild(userDetails.getUsername(), addChildRequest), 201));
+        return ResponseEntity.status(201).body(ApiResponse.success(parentService.addChild(userDetails.getUsername(), addChildRequest), 201, "Child added successfully"));
     }
 
     @GetMapping("/children")
     public ResponseEntity<ApiResponse<List<ChildResponse>>> getMyChildren(
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success(parentService.getMyChildren(userDetails.getUsername()), 200));
+        return ResponseEntity.ok(ApiResponse.success(parentService.getMyChildren(userDetails.getUsername()), 200, "Children fetched successfully"));
     }
 
     @GetMapping("/therapists")
     public ResponseEntity<ApiResponse<List<TherapistResponse>>> getAllTherapists() {
-        return ResponseEntity.ok(ApiResponse.success(parentService.getAllTherapists(), 200));
+        return ResponseEntity.ok(ApiResponse.success(parentService.getAllTherapists(), 200, "Therapists fetched successfully"));
     }
 }

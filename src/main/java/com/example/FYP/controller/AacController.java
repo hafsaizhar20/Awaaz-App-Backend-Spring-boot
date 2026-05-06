@@ -30,12 +30,12 @@ public class AacController {
 
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories(@RequestParam(required = false) Long childId) {
-        return ResponseEntity.ok(ApiResponse.success(aacService.getAllCategories(childId), 200));
+        return ResponseEntity.ok(ApiResponse.success(aacService.getAllCategories(childId), 200, "Categories fetched successfully"));
     }
 
     @GetMapping("/categories/{categoryId}/icons")
     public ResponseEntity<ApiResponse<List<IconResponse>>> getIconsByCategory(@PathVariable Long categoryId, @RequestParam(required = false) Long childId) {
-        return ResponseEntity.ok(ApiResponse.success(aacService.getIconsByCategory(categoryId, childId), 200));
+        return ResponseEntity.ok(ApiResponse.success(aacService.getIconsByCategory(categoryId, childId), 200, "Icons fetched successfully"));
     }
 
     @PostMapping(value = "/categories", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -44,7 +44,7 @@ public class AacController {
             @RequestPart("category") @Valid CreateCategoryRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
             Principal principal) throws IOException {
-        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createCategory(principal.getName(), request, file), 201));
+        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createCategory(principal.getName(), request, file), 201, "Category created successfully"));
     }
 
     @PostMapping(value = "/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,19 +53,19 @@ public class AacController {
             @RequestPart("icon") @Valid CreateIconRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
             Principal principal) throws IOException {
-        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createIcon(principal.getName(), request, file), 201));
+        return ResponseEntity.status(201).body(ApiResponse.success(aacService.createIcon(principal.getName(), request, file), 201, "Icon created successfully"));
     }
 
     @PostMapping("/log")
     @PreAuthorize("hasRole('CHILD')")
     public ResponseEntity<ApiResponse<Void>> logUsage(@Valid @RequestBody LogUsageRequest request, Principal principal) {
         aacService.logUsage(principal.getName(), request);
-        return ResponseEntity.ok(ApiResponse.success(null, 200));
+        return ResponseEntity.ok(ApiResponse.success(null, 200, "Usage logged successfully"));
     }
 
     @GetMapping("/analytics/{childId}")
     @PreAuthorize("hasAnyRole('PARENT', 'THERAPIST', 'ADMIN')")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAnalytics(@PathVariable Long childId) {
-        return ResponseEntity.ok(ApiResponse.success(aacService.getUsageAnalytics(childId), 200));
+        return ResponseEntity.ok(ApiResponse.success(aacService.getUsageAnalytics(childId), 200, "Analytics fetched successfully"));
     }
 }

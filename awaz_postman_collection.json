@@ -1,67 +1,65 @@
 {
 	"info": {
-		"_postman_id": "98765432-1234-5678-90ab-cdef12345678",
-		"name": "AWAZ FYP - Final Unified Collection",
-		"description": "The complete structured API collection for the AWAZ Autism Communication App, including Personalized Boards and Image Uploads.",
+		"_postman_id": "awaz-fyp-full-v2",
+		"name": "AWAZ FYP — Full Backend Collection",
+		"description": "Complete API collection for AWAZ Autism Communication App (Spring Boot). Auth, Parent, Therapist, AAC Boards, Personalized Boards, Analytics.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8081", "description": "Spring Boot server. Change to Render URL in prod." },
+		{ "key": "parentToken", "value": "PASTE_PARENT_JWT_HERE" },
+		{ "key": "therapistToken", "value": "PASTE_THERAPIST_JWT_HERE" },
+		{ "key": "childToken", "value": "PASTE_CHILD_JWT_HERE" },
+		{ "key": "childId", "value": "1" },
+		{ "key": "categoryId", "value": "1" }
+	],
 	"item": [
 		{
 			"name": "1. Authentication",
 			"item": [
 				{
-					"name": "Register Parent",
+					"name": "Register (Parent)",
 					"request": {
 						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\",\n  \"fullName\": \"John Parent\",\n  \"role\": \"PARENT\",\n  \"address\": \"Street 123, Lahore\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/auth/register",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"register"
-							]
-						}
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\",\n  \"fullName\": \"Ahmed Khan\",\n  \"role\": \"PARENT\",\n  \"address\": \"Street 5, Lahore\"\n}", "options": { "raw": { "language": "json" } } },
+						"url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+					},
+					"response": []
+				},
+				{
+					"name": "Register (Therapist)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"email\": \"therapist@example.com\",\n  \"password\": \"Password123\",\n  \"fullName\": \"Dr. Sara Ali\",\n  \"role\": \"THERAPIST\",\n  \"address\": \"Clinic Block B, Karachi\"\n}", "options": { "raw": { "language": "json" } } },
+						"url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
 					},
 					"response": []
 				},
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();",
+									"if (res.data && res.data.token) {",
+									"  pm.collectionVariables.set('parentToken', res.data.token);",
+									"  console.log('Token auto-saved to parentToken');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/auth/login",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"login"
-							]
-						}
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"email\": \"parent@example.com\",\n  \"password\": \"Password123\"\n}", "options": { "raw": { "language": "json" } } },
+						"url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+						"description": "The test script auto-saves the returned JWT to `parentToken` collection variable."
 					},
 					"response": []
 				}
@@ -69,309 +67,172 @@
 		},
 		{
 			"name": "2. Parent Dashboard",
+			"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{parentToken}}", "type": "string" }] },
 			"item": [
 				{
-					"name": "Register/Add Child",
+					"name": "Add Child",
 					"request": {
 						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"child@example.com\",\n  \"password\": \"ChildPass123\",\n  \"firstName\": \"Little\",\n  \"lastName\": \"John\",\n  \"dateOfBirth\": \"2018-01-01\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/parents/children",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"parents",
-								"children"
-							]
-						}
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"email\": \"child@example.com\",\n  \"password\": \"ChildPass123\",\n  \"firstName\": \"Ali\",\n  \"lastName\": \"Khan\",\n  \"dateOfBirth\": \"2018-05-14\"\n}", "options": { "raw": { "language": "json" } } },
+						"url": { "raw": "{{baseUrl}}/api/parents/children", "host": ["{{baseUrl}}"], "path": ["api","parents","children"] }
 					},
 					"response": []
 				},
 				{
-					"name": "Get My Children List",
+					"name": "Get My Children",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{FYPurl}}/api/parents/children",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"parents",
-								"children"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{parentToken}}",
-						"type": "string"
-					}
-				]
-			}
-		},
-		{
-			"name": "3. AAC Global Board",
-			"item": [
-				{
-					"name": "View Standard Categories (Startup Data)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"categories"
-							]
-						}
+						"url": { "raw": "{{baseUrl}}/api/parents/children", "host": ["{{baseUrl}}"], "path": ["api","parents","children"] }
 					},
 					"response": []
 				},
 				{
-					"name": "View Icons in Category",
+					"name": "Get All Therapists",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories/1/icons",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"categories",
-								"1",
-								"icons"
-							]
-						}
+						"url": { "raw": "{{baseUrl}}/api/parents/therapists", "host": ["{{baseUrl}}"], "path": ["api","parents","therapists"] }
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "4. Personalized Boards (Parent Only)",
+			"name": "3. Therapist Dashboard",
+			"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{therapistToken}}", "type": "string" }] },
 			"item": [
 				{
-					"name": "Create Custom Category for Child",
+					"name": "Get My Assigned Children",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "category",
-									"value": "{\n  \"name\": \"My Favorite Toys\",\n  \"childId\": 1\n}",
-									"type": "text"
-								},
-								{
-									"key": "file",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"categories"
-							]
-						}
+						"url": { "raw": "{{baseUrl}}/api/therapists/children", "host": ["{{baseUrl}}"], "path": ["api","therapists","children"] }
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. AAC — Global Board",
+			"item": [
+				{
+					"name": "Get All Standard Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/api/aac/categories", "host": ["{{baseUrl}}"], "path": ["api","aac","categories"] },
+						"description": "Returns global/standard AAC categories. No auth required."
 					},
 					"response": []
 				},
 				{
-					"name": "Create Custom Icon for Child (With Image Upload)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "icon",
-									"value": "{\n  \"label\": \"My Teddy Bear\",\n  \"categoryId\": 1,\n  \"childId\": 1\n}",
-									"type": "text"
-								},
-								{
-									"key": "file",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/icons",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"icons"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View Personalized Board for Child",
+					"name": "Get Personalized Categories For Child",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{FYPurl}}/api/aac/categories?childId=1",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"categories"
-							],
-							"query": [
-								{
-									"key": "childId",
-									"value": "1"
-								}
-							]
-						}
+							"raw": "{{baseUrl}}/api/aac/categories?childId={{childId}}",
+							"host": ["{{baseUrl}}"], "path": ["api","aac","categories"],
+							"query": [{ "key": "childId", "value": "{{childId}}" }]
+						},
+						"description": "Returns merged global + custom categories for a specific child."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Icons In Category (Global)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/api/aac/categories/{{categoryId}}/icons", "host": ["{{baseUrl}}"], "path": ["api","aac","categories","{{categoryId}}","icons"] }
+					},
+					"response": []
+				},
+				{
+					"name": "Get Icons In Category (For Child)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/aac/categories/{{categoryId}}/icons?childId={{childId}}",
+							"host": ["{{baseUrl}}"], "path": ["api","aac","categories","{{categoryId}}","icons"],
+							"query": [{ "key": "childId", "value": "{{childId}}" }]
+						},
+						"description": "Returns merged global + child-specific icons."
 					},
 					"response": []
 				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{parentToken}}",
-						"type": "string"
-					}
-				]
-			}
+			]
 		},
 		{
-			"name": "5. Progress Tracking & Analytics",
+			"name": "5. AAC — Personalized Boards (Parent/Admin)",
+			"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{parentToken}}", "type": "string" }] },
 			"item": [
 				{
-					"name": "Log Icon Usage (Child Only)",
+					"name": "Create Custom Category For Child",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{childToken}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"iconId\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/log",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"log"
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "category", "value": "{\n  \"name\": \"My Favourite Toys\",\n  \"childId\": 1\n}", "type": "text", "contentType": "application/json" },
+								{ "key": "file", "description": "Optional image. Leave blank to skip.", "type": "file", "src": [] }
 							]
-						}
+						},
+						"url": { "raw": "{{baseUrl}}/api/aac/categories", "host": ["{{baseUrl}}"], "path": ["api","aac","categories"] },
+						"description": "Multipart form. `category` is a JSON text part. `file` is optional image upload."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Custom Icon For Child (Image Upload)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "icon", "value": "{\n  \"label\": \"My Teddy Bear\",\n  \"categoryId\": 1,\n  \"childId\": 1\n}", "type": "text", "contentType": "application/json" },
+								{ "key": "file", "description": "Optional image. Leave blank to skip.", "type": "file", "src": [] }
+							]
+						},
+						"url": { "raw": "{{baseUrl}}/api/aac/icons", "host": ["{{baseUrl}}"], "path": ["api","aac","icons"] },
+						"description": "Multipart form. `icon` is a JSON text part. `file` is optional image upload."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. AAC — Progress & Analytics",
+			"item": [
+				{
+					"name": "Log Icon Usage (Child)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{childToken}}", "type": "string" }] },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": { "mode": "raw", "raw": "{\n  \"iconId\": 1\n}", "options": { "raw": { "language": "json" } } },
+						"url": { "raw": "{{baseUrl}}/api/aac/log", "host": ["{{baseUrl}}"], "path": ["api","aac","log"] },
+						"description": "Requires CHILD role JWT. Call this when a child taps an icon."
 					},
 					"response": []
 				},
 				{
 					"name": "Get Child Usage Analytics (Parent/Therapist)",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{parentToken}}",
-									"type": "string"
-								}
-							]
-						},
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{parentToken}}", "type": "string" }] },
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{FYPurl}}/api/aac/analytics/1",
-							"host": [
-								"{{FYPurl}}"
-							],
-							"path": [
-								"api",
-								"aac",
-								"analytics",
-								"1"
-							]
-						}
+						"url": { "raw": "{{baseUrl}}/api/aac/analytics/{{childId}}", "host": ["{{baseUrl}}"], "path": ["api","aac","analytics","{{childId}}"] },
+						"description": "Returns icon usage frequency for the specified child. Accessible by PARENT, THERAPIST, ADMIN."
 					},
 					"response": []
 				}
 			]
-		}
-	],
-	"variable": [
-		{
-			"key": "FYPurl",
-			"value": "http://localhost:8081"
-		},
-		{
-			"key": "parentToken",
-			"value": "PASTE_TOKEN_HERE"
-		},
-		{
-			"key": "therapistToken",
-			"value": "PASTE_TOKEN_HERE"
-		},
-		{
-			"key": "childToken",
-			"value": "PASTE_TOKEN_HERE"
 		}
 	]
 }

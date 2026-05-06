@@ -18,11 +18,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        return ResponseEntity.status(201).body(ApiResponse.success(authService.register(registerRequest), 201));
+        return ResponseEntity.status(201).body(ApiResponse.success(authService.register(registerRequest), 201, "User registered successfully"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(ApiResponse.success(authService.login(loginRequest), 200));
+        return ResponseEntity.ok(ApiResponse.success(authService.login(loginRequest), 200, "Login successful"));
     }
 }

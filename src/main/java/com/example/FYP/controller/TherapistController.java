@@ -26,8 +26,8 @@ public class TherapistController {
     public ResponseEntity<ApiResponse<List<ChildResponse>>> getMyAssignedChildren(
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.success(
-                therapistService.getAssignedChildren(userDetails.getUsername()), 
-                200
-        ));
+                therapistService.getAssignedChildren(userDetails.getUsername()),
+                200,
+                "Assigned children fetched successfully"));
     }
 }

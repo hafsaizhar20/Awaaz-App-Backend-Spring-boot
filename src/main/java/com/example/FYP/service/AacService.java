@@ -39,15 +39,36 @@ public class AacService {
     }
 
     public List<CategoryResponse> getAllCategories(Long childId) {
-        List<AacCategory> categories;
+        ChildProfile child = null;
         if (childId != null) {
-            ChildProfile child = childProfileRepository.findById(childId)
+            child = childProfileRepository.findById(childId)
                     .orElseThrow(() -> new RuntimeException("Child not found"));
+        }
+
+        List<AacCategory> categories;
+        if (child != null) {
             categories = categoryRepository.findByChildOrChildIsNull(child);
         } else {
             categories = categoryRepository.findByChildIsNull();
         }
-        return categories.stream().map(this::mapToCategoryResponse).collect(java.util.stream.Collectors.toList());
+
+        final ChildProfile finalChild = child;
+        return categories.stream().map(category -> {
+            List<AacIcon> icons;
+            if (finalChild != null) {
+                // Get standard icons + this child's custom icons for this category
+                icons = iconRepository.findByCategoryAndChildOrChildIsNull(category, finalChild);
+            } else {
+                // Get only standard icons for this category
+                icons = iconRepository.findByCategoryAndChildIsNull(category);
+            }
+            
+            CategoryResponse resp = mapToCategoryResponse(category);
+            resp.setIcons(icons.stream()
+                    .map(this::mapToIconResponse)
+                    .collect(java.util.stream.Collectors.toList()));
+            return resp;
+        }).collect(java.util.stream.Collectors.toList());
     }
 
     public List<IconResponse> getIconsByCategory(Long categoryId, Long childId) {
