@@ -83,7 +83,7 @@ public class AuthService {
                     .firstName(firstName != null ? firstName : "")
                     .lastName(lastName != null ? lastName : "")
                     .contactNumber(request.getContactNumber() != null ? request.getContactNumber() : "")
-                    .specialization(request.getSpecialization())
+                    .specialization(request.getSpecialization() != null ? request.getSpecialization() : "")
                     .build();
             therapistProfileRepository.save(therapistProfile);
         }
