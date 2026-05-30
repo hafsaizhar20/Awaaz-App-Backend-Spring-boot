@@ -18,6 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ParentProfileRepository parentProfileRepository;
     private final TherapistProfileRepository therapistProfileRepository;
+    private final ChildProfileRepository childProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
@@ -25,12 +26,14 @@ public class AuthService {
     public AuthService(UserRepository userRepository,
             ParentProfileRepository parentProfileRepository,
             TherapistProfileRepository therapistProfileRepository,
+            ChildProfileRepository childProfileRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.parentProfileRepository = parentProfileRepository;
         this.therapistProfileRepository = therapistProfileRepository;
+        this.childProfileRepository = childProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -50,6 +53,8 @@ public class AuthService {
 
         userRepository.save(user);
 
+        Object profileDetails = null;
+
         if (request.getRole() == UserRole.PARENT) {
             String firstName = request.getFirstName();
             String lastName = request.getLastName();
@@ -68,6 +73,15 @@ public class AuthService {
                     .address(request.getAddress())
                     .build();
             parentProfileRepository.save(parentProfile);
+
+            profileDetails = ParentResponse.builder()
+                    .id(parentProfile.getId())
+                    .email(user.getEmail())
+                    .firstName(parentProfile.getFirstName())
+                    .lastName(parentProfile.getLastName())
+                    .contactNumber(parentProfile.getContactNumber())
+                    .address(parentProfile.getAddress())
+                    .build();
         } else if (request.getRole() == UserRole.THERAPIST) {
             String firstName = request.getFirstName();
             String lastName = request.getLastName();
@@ -86,6 +100,14 @@ public class AuthService {
                     .specialization(request.getSpecialization() != null ? request.getSpecialization() : "")
                     .build();
             therapistProfileRepository.save(therapistProfile);
+
+            profileDetails = TherapistResponse.builder()
+                    .id(therapistProfile.getId())
+                    .firstName(therapistProfile.getFirstName())
+                    .lastName(therapistProfile.getLastName())
+                    .specialization(therapistProfile.getSpecialization())
+                    .email(user.getEmail())
+                    .build();
         }
 
         String jwt = jwtUtils.generateTokenFromEmail(user.getEmail());
@@ -94,6 +116,7 @@ public class AuthService {
                 .token(jwt)
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .profile(profileDetails)
                 .build();
 
         return UserResponse.builder()
@@ -114,10 +137,51 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
+        Object profileDetails = null;
+        if (user.getRole() == UserRole.PARENT) {
+            ParentProfile parentProfile = parentProfileRepository.findByUser(user).orElse(null);
+            if (parentProfile != null) {
+                profileDetails = ParentResponse.builder()
+                        .id(parentProfile.getId())
+                        .email(user.getEmail())
+                        .firstName(parentProfile.getFirstName())
+                        .lastName(parentProfile.getLastName())
+                        .contactNumber(parentProfile.getContactNumber())
+                        .address(parentProfile.getAddress())
+                        .build();
+            }
+        } else if (user.getRole() == UserRole.THERAPIST) {
+            TherapistProfile therapistProfile = therapistProfileRepository.findByUser(user).orElse(null);
+            if (therapistProfile != null) {
+                profileDetails = TherapistResponse.builder()
+                        .id(therapistProfile.getId())
+                        .firstName(therapistProfile.getFirstName())
+                        .lastName(therapistProfile.getLastName())
+                        .specialization(therapistProfile.getSpecialization())
+                        .email(user.getEmail())
+                        .build();
+            }
+        } else if (user.getRole() == UserRole.CHILD) {
+            ChildProfile childProfile = childProfileRepository.findByUser(user).orElse(null);
+            if (childProfile != null) {
+                profileDetails = ChildResponse.builder()
+                        .id(childProfile.getId())
+                        .email(user.getEmail())
+                        .firstName(childProfile.getFirstName())
+                        .lastName(childProfile.getLastName())
+                        .dateOfBirth(childProfile.getDateOfBirth())
+                        .diagnosisDetails(childProfile.getDiagnosisDetails())
+                        .therapistName(childProfile.getTherapist() != null ? 
+                                childProfile.getTherapist().getFirstName() + " " + childProfile.getTherapist().getLastName() : null)
+                        .build();
+            }
+        }
+
         return AuthResponse.builder()
                 .token(jwt)
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .profile(profileDetails)
                 .build();
     }
 }
