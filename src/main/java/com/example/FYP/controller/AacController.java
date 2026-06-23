@@ -47,6 +47,25 @@ public class AacController {
         return ResponseEntity.status(201).body(ApiResponse.success(aacService.createCategory(principal.getName(), request, file), 201, "Category created successfully"));
     }
 
+    @PutMapping(value = "/categories/{categoryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
+            @PathVariable Long categoryId,
+            @RequestPart(value = "category", required = false) UpdateCategoryRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            Principal principal) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(aacService.updateCategory(principal.getName(), categoryId, request, file), 200, "Category updated successfully"));
+    }
+
+    @DeleteMapping("/categories/{categoryId}")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(
+            @PathVariable Long categoryId,
+            Principal principal) {
+        aacService.deleteCategory(principal.getName(), categoryId);
+        return ResponseEntity.ok(ApiResponse.success(null, 200, "Category deleted successfully"));
+    }
+
     @PostMapping(value = "/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
     public ResponseEntity<ApiResponse<IconResponse>> createIcon(

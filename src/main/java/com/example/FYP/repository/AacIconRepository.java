@@ -22,4 +22,5 @@ public interface AacIconRepository extends JpaRepository<AacIcon, Long> {
     boolean existsByLabelAndCategoryAndChildIsNull(String label, AacCategory category);
 
     boolean existsByLabelAndCategoryAndChild(String label, AacCategory category, ChildProfile child);
+    void deleteByChild(ChildProfile child);
 }

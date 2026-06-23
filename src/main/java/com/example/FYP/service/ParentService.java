@@ -18,17 +18,26 @@ public class ParentService {
     private final TherapistProfileRepository therapistProfileRepository;
     private final ChildProfileRepository childProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AacCategoryRepository categoryRepository;
+    private final AacIconRepository iconRepository;
+    private final AacUsageLogRepository usageLogRepository;
 
     public ParentService(UserRepository userRepository, 
                          ParentProfileRepository parentProfileRepository, 
                          TherapistProfileRepository therapistProfileRepository, 
                          ChildProfileRepository childProfileRepository, 
-                         PasswordEncoder passwordEncoder) {
+                         PasswordEncoder passwordEncoder,
+                         AacCategoryRepository categoryRepository,
+                         AacIconRepository iconRepository,
+                         AacUsageLogRepository usageLogRepository) {
         this.userRepository = userRepository;
         this.parentProfileRepository = parentProfileRepository;
         this.therapistProfileRepository = therapistProfileRepository;
         this.childProfileRepository = childProfileRepository;
         this.passwordEncoder = passwordEncoder;
+        this.categoryRepository = categoryRepository;
+        this.iconRepository = iconRepository;
+        this.usageLogRepository = usageLogRepository;
     }
 
     @Transactional
@@ -112,6 +121,83 @@ public class ParentService {
 
         child.setTherapist(therapistProfile);
         childProfileRepository.save(child);
+    }
+
+    @Transactional
+    public ChildResponse updateChild(String parentEmail, Long childId, UpdateChildRequest request) {
+        User parentUser = userRepository.findByEmail(parentEmail).orElseThrow(() -> new RuntimeException("Parent not found"));
+        ParentProfile parentProfile = parentProfileRepository.findByUser(parentUser).orElseThrow(() -> new RuntimeException("Parent profile not found"));
+
+        ChildProfile child = childProfileRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
+        if (!child.getParent().getId().equals(parentProfile.getId())) {
+            throw new RuntimeException("Unauthorized: This child does not belong to you");
+        }
+
+        if (request.getFirstName() != null) {
+            child.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            child.setLastName(request.getLastName());
+        }
+        if (request.getDateOfBirth() != null) {
+            child.setDateOfBirth(request.getDateOfBirth());
+        }
+        if (request.getDiagnosisDetails() != null) {
+            child.setDiagnosisDetails(request.getDiagnosisDetails());
+        }
+
+        if (request.getTherapistId() != null) {
+            if (request.getTherapistId() == -1) {
+                child.setTherapist(null);
+            } else {
+                TherapistProfile therapist = therapistProfileRepository.findById(request.getTherapistId())
+                        .orElseThrow(() -> new RuntimeException("Therapist not found"));
+                child.setTherapist(therapist);
+            }
+        }
+
+        return mapToResponse(childProfileRepository.save(child));
+    }
+
+    @Transactional
+    public void unassignTherapist(String parentEmail, Long childId) {
+        User parentUser = userRepository.findByEmail(parentEmail).orElseThrow(() -> new RuntimeException("Parent not found"));
+        ParentProfile parentProfile = parentProfileRepository.findByUser(parentUser).orElseThrow(() -> new RuntimeException("Parent profile not found"));
+
+        ChildProfile child = childProfileRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
+        if (!child.getParent().getId().equals(parentProfile.getId())) {
+            throw new RuntimeException("Unauthorized: This child does not belong to you");
+        }
+
+        child.setTherapist(null);
+        childProfileRepository.save(child);
+    }
+
+    @Transactional
+    public void deleteChild(String parentEmail, Long childId) {
+        User parentUser = userRepository.findByEmail(parentEmail).orElseThrow(() -> new RuntimeException("Parent not found"));
+        ParentProfile parentProfile = parentProfileRepository.findByUser(parentUser).orElseThrow(() -> new RuntimeException("Parent profile not found"));
+
+        ChildProfile child = childProfileRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
+        if (!child.getParent().getId().equals(parentProfile.getId())) {
+            throw new RuntimeException("Unauthorized: This child does not belong to you");
+        }
+
+        usageLogRepository.deleteByChild(child);
+        iconRepository.deleteByChild(child);
+        categoryRepository.deleteByChild(child);
+
+        User childUser = child.getUser();
+        childProfileRepository.delete(child);
+        if (childUser != null) {
+            userRepository.delete(childUser);
+        }
     }
 
     private ChildResponse mapToResponse(ChildProfile profile) {

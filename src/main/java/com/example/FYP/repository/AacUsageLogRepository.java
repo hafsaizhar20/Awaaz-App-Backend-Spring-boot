@@ -20,4 +20,10 @@ public interface AacUsageLogRepository extends JpaRepository<AacUsageLog, Long> 
            "GROUP BY l.icon.label " +
            "ORDER BY COUNT(l) DESC")
     List<Map<String, Object>> getUsageStatsByChild(ChildProfile child);
+
+    void deleteByChild(ChildProfile child);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM AacUsageLog l WHERE l.icon.category = :category")
+    void deleteByIconCategory(com.example.FYP.model.AacCategory category);
 }

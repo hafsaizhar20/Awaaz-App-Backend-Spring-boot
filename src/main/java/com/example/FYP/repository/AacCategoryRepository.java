@@ -13,4 +13,7 @@ public interface AacCategoryRepository extends JpaRepository<AacCategory, Long> 
     List<AacCategory> findByChildOrChildIsNull(ChildProfile child);
     boolean existsByNameAndChildIsNull(String name);
     boolean existsByNameAndChild(String name, ChildProfile child);
+    boolean existsByNameAndChildIsNullAndIdNot(String name, Long id);
+    boolean existsByNameAndChildAndIdNot(String name, ChildProfile child, Long id);
+    void deleteByChild(ChildProfile child);
 }

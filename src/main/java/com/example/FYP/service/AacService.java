@@ -114,6 +114,64 @@ public class AacService {
     }
 
     @Transactional
+    public CategoryResponse updateCategory(String email, Long categoryId, UpdateCategoryRequest request, MultipartFile file) throws IOException {
+        AacCategory category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (category.getChild() != null) {
+            verifyAndGetChild(email, category.getChild().getId());
+        } else {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            if (user.getRole() != UserRole.PARENT && user.getRole() != UserRole.ADMIN) {
+                throw new RuntimeException("Unauthorized: Only parents or admins can modify categories");
+            }
+        }
+
+        if (request != null && request.getName() != null && !request.getName().trim().isEmpty()) {
+            String newName = request.getName().trim();
+            if (category.getChild() != null) {
+                if (categoryRepository.existsByNameAndChildAndIdNot(newName, category.getChild(), categoryId)) {
+                    throw new RuntimeException("Category '" + newName + "' already exists for this child.");
+                }
+            } else {
+                if (categoryRepository.existsByNameAndChildIsNullAndIdNot(newName, categoryId)) {
+                    throw new RuntimeException("Standard category '" + newName + "' already exists.");
+                }
+            }
+            category.setName(newName);
+        }
+
+        if (file != null && !file.isEmpty()) {
+            String iconUrl = storageService.uploadImage(file);
+            category.setIconUrl(iconUrl);
+        } else if (request != null && request.getIconUrl() != null) {
+            category.setIconUrl(request.getIconUrl());
+        }
+
+        return mapToCategoryResponse(categoryRepository.save(category));
+    }
+
+    @Transactional
+    public void deleteCategory(String email, Long categoryId) {
+        AacCategory category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (category.getChild() != null) {
+            verifyAndGetChild(email, category.getChild().getId());
+        } else {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            if (user.getRole() != UserRole.PARENT && user.getRole() != UserRole.ADMIN) {
+                throw new RuntimeException("Unauthorized: Only parents or admins can delete categories");
+            }
+        }
+
+        usageLogRepository.deleteByIconCategory(category);
+        categoryRepository.delete(category);
+    }
+
+    @Transactional
     public IconResponse createIcon(String email, CreateIconRequest request, MultipartFile file) throws IOException {
         AacCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
