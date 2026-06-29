@@ -75,6 +75,25 @@ public class AacController {
         return ResponseEntity.status(201).body(ApiResponse.success(aacService.createIcon(principal.getName(), request, file), 201, "Icon created successfully"));
     }
 
+    @PutMapping(value = "/icons/{iconId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<IconResponse>> updateIcon(
+            @PathVariable Long iconId,
+            @RequestPart(value = "icon", required = false) UpdateIconRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            Principal principal) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(aacService.updateIcon(principal.getName(), iconId, request, file), 200, "Icon updated successfully"));
+    }
+
+    @DeleteMapping("/icons/{iconId}")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteIcon(
+            @PathVariable Long iconId,
+            Principal principal) {
+        aacService.deleteIcon(principal.getName(), iconId);
+        return ResponseEntity.ok(ApiResponse.success(null, 200, "Icon deleted successfully"));
+    }
+
     @PostMapping("/log")
     @PreAuthorize("hasRole('CHILD')")
     public ResponseEntity<ApiResponse<Void>> logUsage(@Valid @RequestBody LogUsageRequest request, Principal principal) {

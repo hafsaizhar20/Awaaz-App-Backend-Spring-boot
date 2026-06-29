@@ -11,8 +11,10 @@ import lombok.*;
 public class CreateIconRequest {
     @NotBlank(message = "Label is required")
     private String label;
+    private String labelUr;
     private String imageUrl;
     private String speechText;
+    private String speechTextUr;
     
     @NotNull(message = "Category ID is required")
     private Long categoryId;

@@ -2,6 +2,7 @@ package com.example.FYP.repository;
 
 import com.example.FYP.model.AacUsageLog;
 import com.example.FYP.model.ChildProfile;
+import com.example.FYP.model.AacIcon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,6 @@ public interface AacUsageLogRepository extends JpaRepository<AacUsageLog, Long> 
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.data.jpa.repository.Query("DELETE FROM AacUsageLog l WHERE l.icon.category = :category")
     void deleteByIconCategory(com.example.FYP.model.AacCategory category);
+
+    void deleteByIcon(AacIcon icon);
 }

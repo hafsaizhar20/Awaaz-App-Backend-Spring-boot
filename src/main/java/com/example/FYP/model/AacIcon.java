@@ -22,9 +22,13 @@ public class AacIcon {
     @Column(nullable = false)
     private String label;
 
+    private String labelUr;
+
     private String imageUrl;
 
     private String speechText;
+
+    private String speechTextUr;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

@@ -6,13 +6,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IconResponse {
-    private Long id;
+public class UpdateIconRequest {
     private String label;
     private String labelUr;
-    private String imageUrl;
     private String speechText;
     private String speechTextUr;
     private Long categoryId;
-    private Long childId;
+    private String imageUrl;
 }

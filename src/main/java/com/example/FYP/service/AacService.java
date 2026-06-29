@@ -107,6 +107,7 @@ public class AacService {
 
         AacCategory category = AacCategory.builder()
                 .name(request.getName())
+                .nameUr(request.getNameUr())
                 .iconUrl(iconUrl)
                 .child(child)
                 .build();
@@ -121,11 +122,7 @@ public class AacService {
         if (category.getChild() != null) {
             verifyAndGetChild(email, category.getChild().getId());
         } else {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            if (user.getRole() != UserRole.PARENT && user.getRole() != UserRole.ADMIN) {
-                throw new RuntimeException("Unauthorized: Only parents or admins can modify categories");
-            }
+            throw new RuntimeException("Standard categories cannot be updated");
         }
 
         if (request != null && request.getName() != null && !request.getName().trim().isEmpty()) {
@@ -140,6 +137,10 @@ public class AacService {
                 }
             }
             category.setName(newName);
+        }
+
+        if (request != null && request.getNameUr() != null) {
+            category.setNameUr(request.getNameUr().trim());
         }
 
         if (file != null && !file.isEmpty()) {
@@ -160,11 +161,7 @@ public class AacService {
         if (category.getChild() != null) {
             verifyAndGetChild(email, category.getChild().getId());
         } else {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            if (user.getRole() != UserRole.PARENT && user.getRole() != UserRole.ADMIN) {
-                throw new RuntimeException("Unauthorized: Only parents or admins can delete categories");
-            }
+            throw new RuntimeException("Standard categories cannot be deleted");
         }
 
         usageLogRepository.deleteByIconCategory(category);
@@ -195,18 +192,82 @@ public class AacService {
 
         AacIcon icon = AacIcon.builder()
                 .label(request.getLabel())
+                .labelUr(request.getLabelUr())
                 .imageUrl(imageUrl)
                 .speechText(request.getSpeechText() != null ? request.getSpeechText() : request.getLabel())
+                .speechTextUr(request.getSpeechTextUr() != null ? request.getSpeechTextUr() : request.getLabelUr())
                 .category(category)
                 .child(child)
                 .build();
         return mapToIconResponse(iconRepository.save(icon));
     }
 
+    @Transactional
+    public IconResponse updateIcon(String email, Long iconId, UpdateIconRequest request, MultipartFile file) throws IOException {
+        AacIcon icon = iconRepository.findById(iconId)
+                .orElseThrow(() -> new RuntimeException("Icon not found"));
+
+        if (icon.getChild() != null) {
+            verifyAndGetChild(email, icon.getChild().getId());
+        } else {
+            throw new RuntimeException("Standard icons cannot be updated");
+        }
+
+        if (request != null && request.getCategoryId() != null) {
+            AacCategory category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            if (category.getChild() != null && !category.getChild().getId().equals(icon.getChild().getId())) {
+                throw new RuntimeException("Unauthorized: Cannot move icon to this category");
+            }
+            icon.setCategory(category);
+        }
+
+        if (request != null && request.getLabel() != null && !request.getLabel().trim().isEmpty()) {
+            icon.setLabel(request.getLabel().trim());
+        }
+
+        if (request != null && request.getLabelUr() != null) {
+            icon.setLabelUr(request.getLabelUr().trim());
+        }
+
+        if (request != null && request.getSpeechText() != null) {
+            icon.setSpeechText(request.getSpeechText().trim());
+        }
+
+        if (request != null && request.getSpeechTextUr() != null) {
+            icon.setSpeechTextUr(request.getSpeechTextUr().trim());
+        }
+
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = storageService.uploadImage(file);
+            icon.setImageUrl(imageUrl);
+        } else if (request != null && request.getImageUrl() != null) {
+            icon.setImageUrl(request.getImageUrl());
+        }
+
+        return mapToIconResponse(iconRepository.save(icon));
+    }
+
+    @Transactional
+    public void deleteIcon(String email, Long iconId) {
+        AacIcon icon = iconRepository.findById(iconId)
+                .orElseThrow(() -> new RuntimeException("Icon not found"));
+
+        if (icon.getChild() != null) {
+            verifyAndGetChild(email, icon.getChild().getId());
+        } else {
+            throw new RuntimeException("Standard icons cannot be deleted");
+        }
+
+        usageLogRepository.deleteByIcon(icon);
+        iconRepository.delete(icon);
+    }
+
     private CategoryResponse mapToCategoryResponse(AacCategory category) {
         return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
+                .nameUr(category.getNameUr())
                 .iconUrl(category.getIconUrl())
                 .childId(category.getChild() != null ? category.getChild().getId() : null)
                 .build();
@@ -216,8 +277,10 @@ public class AacService {
         return IconResponse.builder()
                 .id(icon.getId())
                 .label(icon.getLabel())
+                .labelUr(icon.getLabelUr())
                 .imageUrl(icon.getImageUrl())
                 .speechText(icon.getSpeechText())
+                .speechTextUr(icon.getSpeechTextUr())
                 .categoryId(icon.getCategory().getId())
                 .childId(icon.getChild() != null ? icon.getChild().getId() : null)
                 .build();

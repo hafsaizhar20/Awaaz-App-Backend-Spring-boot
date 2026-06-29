@@ -23,6 +23,8 @@ public class AacCategory {
     @Column(nullable = false)
     private String name;
 
+    private String nameUr;
+
     private String iconUrl;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

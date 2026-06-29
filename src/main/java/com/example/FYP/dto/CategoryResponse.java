@@ -10,6 +10,7 @@ import java.util.List;
 public class CategoryResponse {
     private Long id;
     private String name;
+    private String nameUr;
     private String iconUrl;
     private Long childId;
     private List<IconResponse> icons;
