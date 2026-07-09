@@ -16,4 +16,5 @@ public class ChildResponse {
     private LocalDate dateOfBirth;
     private String diagnosisDetails;
     private String therapistName;
+    private TherapistResponse therapist;
 }

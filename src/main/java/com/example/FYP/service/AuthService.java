@@ -164,6 +164,17 @@ public class AuthService {
         } else if (user.getRole() == UserRole.CHILD) {
             ChildProfile childProfile = childProfileRepository.findByUser(user).orElse(null);
             if (childProfile != null) {
+                TherapistResponse therapistResponse = null;
+                if (childProfile.getTherapist() != null) {
+                    therapistResponse = TherapistResponse.builder()
+                            .id(childProfile.getTherapist().getId())
+                            .firstName(childProfile.getTherapist().getFirstName())
+                            .lastName(childProfile.getTherapist().getLastName())
+                            .specialization(childProfile.getTherapist().getSpecialization())
+                            .email(childProfile.getTherapist().getUser().getEmail())
+                            .build();
+                }
+
                 profileDetails = ChildResponse.builder()
                         .id(childProfile.getId())
                         .email(user.getEmail())
@@ -173,6 +184,7 @@ public class AuthService {
                         .diagnosisDetails(childProfile.getDiagnosisDetails())
                         .therapistName(childProfile.getTherapist() != null ? 
                                 childProfile.getTherapist().getFirstName() + " " + childProfile.getTherapist().getLastName() : null)
+                        .therapist(therapistResponse)
                         .build();
             }
         }

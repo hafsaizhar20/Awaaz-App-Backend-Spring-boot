@@ -201,6 +201,17 @@ public class ParentService {
     }
 
     private ChildResponse mapToResponse(ChildProfile profile) {
+        TherapistResponse therapistResponse = null;
+        if (profile.getTherapist() != null) {
+            therapistResponse = TherapistResponse.builder()
+                    .id(profile.getTherapist().getId())
+                    .firstName(profile.getTherapist().getFirstName())
+                    .lastName(profile.getTherapist().getLastName())
+                    .specialization(profile.getTherapist().getSpecialization())
+                    .email(profile.getTherapist().getUser().getEmail())
+                    .build();
+        }
+
         return ChildResponse.builder()
                 .id(profile.getId())
                 .email(profile.getUser().getEmail())
@@ -210,6 +221,7 @@ public class ParentService {
                 .diagnosisDetails(profile.getDiagnosisDetails())
                 .therapistName(profile.getTherapist() != null ? 
                         profile.getTherapist().getFirstName() + " " + profile.getTherapist().getLastName() : null)
+                .therapist(therapistResponse)
                 .build();
     }
 }

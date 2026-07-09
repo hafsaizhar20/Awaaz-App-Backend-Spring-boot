@@ -1,6 +1,7 @@
 package com.example.FYP.service;
 
 import com.example.FYP.dto.ChildResponse;
+import com.example.FYP.dto.TherapistResponse;
 import com.example.FYP.model.*;
 import com.example.FYP.repository.*;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,17 @@ public class TherapistService {
     }
 
     private ChildResponse mapToResponse(ChildProfile child) {
+        TherapistResponse therapistResponse = null;
+        if (child.getTherapist() != null) {
+            therapistResponse = TherapistResponse.builder()
+                    .id(child.getTherapist().getId())
+                    .firstName(child.getTherapist().getFirstName())
+                    .lastName(child.getTherapist().getLastName())
+                    .specialization(child.getTherapist().getSpecialization())
+                    .email(child.getTherapist().getUser().getEmail())
+                    .build();
+        }
+
         return ChildResponse.builder()
                 .id(child.getId())
                 .email(child.getUser().getEmail())
@@ -45,6 +57,7 @@ public class TherapistService {
                 .diagnosisDetails(child.getDiagnosisDetails())
                 .therapistName(child.getTherapist() != null ? 
                         child.getTherapist().getFirstName() + " " + child.getTherapist().getLastName() : "Not Assigned")
+                .therapist(therapistResponse)
                 .build();
     }
 }
